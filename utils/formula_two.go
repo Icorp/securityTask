@@ -1,7 +1,7 @@
-package main
+package utils
 
 // Формула 2
-func p(a []float64) float64 {
+func CalculateProbability(a []float64) float64 {
 	partOneValue := calculatePartOne(a)
 	partTwoValue := calculatePartTwo(a)
 	partThreeValue := calculatePartThree(a)

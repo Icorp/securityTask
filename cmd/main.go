@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Icorp/securityTask/utils"
 )
 
 // P - количественная оценка возможности наступления хотя бы одного события (из всех угроз на актив An);
@@ -23,7 +24,7 @@ func main() {
 	selectedActive := 0.15                                        // Выбранный актив
 
 	// Результат вычисления p(a)
-	probabilityResult := p(data)
+	probabilityResult := utils.CalculateProbability(data)
 
 	// Результат вычисления P2(A|B)
 	result := calculateAFromB(selectedActive)
@@ -34,13 +35,13 @@ func main() {
 	a := append(data2, result2)
 
 	// Результат Р2(А1)
-	probabilityResult2 := p(a)
+	probabilityResult2 := utils.CalculateProbability(a)
 
 	// Получаем экспертную оценку.
-	expertValue := GetExpertValue(numOfFix)
+	expertValue := utils.GetExpertValue(numOfFix)
 
 	// Вероятность угрозы P общ
-	pTotal := p([]float64{probabilityResult, probabilityResult2, expertValue})
+	pTotal := utils.CalculateProbability([]float64{probabilityResult, probabilityResult2, expertValue})
 
 	// Величина вероятного ущерба
 	loss := calculateL(bossPrices, expertPrices)
@@ -79,9 +80,5 @@ func dependenceEvent(a float64, b float64) float64 {
 // Результат вычисления P2(A|B)
 func calculateAFromB(b float64) float64 {
 	a := []float64{b, factor, humanFactor}
-	resultOne := calculatePartOne(a)
-	resultTwo := calculatePartTwo(a)
-	resultThree := calculatePartThree(a)
-
-	return resultOne + resultTwo + resultThree
+	return utils.CalculateProbability(a)
 }
