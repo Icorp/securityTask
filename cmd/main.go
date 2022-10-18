@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/Icorp/securityTask/utils"
+	"log"
 )
 
 // P - количественная оценка возможности наступления хотя бы одного события (из всех угроз на актив An);
@@ -25,51 +25,37 @@ func main() {
 
 	// Результат вычисления p(a)
 	probabilityResult := utils.CalculateProbability(data)
+	log.Printf("Угрозы по доступности и целостности можно посчитать по формуле(2): %.2f", probabilityResult)
 
 	// Результат вычисления P2(A|B)
 	result := calculateAFromB(selectedActive)
+	log.Printf("Условная вероятность: %.2f", result)
 
 	// Результат формула зависимых событий Р2(А1B)
 	result2 := dependenceEvent(selectedActive, result)
+	log.Printf("Тогда, по формуле зависимых событий: %.2f", result2)
 
 	a := append(data2, result2)
 
 	// Результат Р2(А1)
 	probabilityResult2 := utils.CalculateProbability(a)
+	log.Printf("Вероятность угрозы по конфиденциальности: %.2f", probabilityResult2)
 
 	// Получаем экспертную оценку.
 	expertValue := utils.GetExpertValue(numOfFix)
+	log.Printf("По экспертным оценкам, вероятность угрозы (Рz) составляет: %.2f", expertValue)
 
 	// Вероятность угрозы P общ
-	pTotal := utils.CalculateProbability([]float64{probabilityResult, probabilityResult2, expertValue})
+	probabilityTotal := utils.CalculateProbability([]float64{probabilityResult, probabilityResult2, expertValue})
+	log.Printf("C вероятностью %.2f с активом А1 произойдет хотя бы одно неблагоприятное событие из списка всех актуальных угроз.", probabilityTotal)
 
 	// Величина вероятного ущерба
-	loss := calculateL(bossPrices, expertPrices)
+	loss := utils.CalculateL(bossPrices, expertPrices)
+	log.Printf("Величина вероятного ущерба по формуле(5): %d", loss)
 
 	// Риск
-	risk := calculateR(pTotal, loss)
-	fmt.Println(risk)
-}
-
-// Велечина вероятного ущерба
-func calculateL(a []int, b []int) int {
-	bossPrices := 0
-	expertPrices := 0
-
-	for _, i2 := range a {
-		bossPrices += i2
-	}
-
-	for _, i2 := range b {
-		expertPrices += i2
-	}
-
-	return bossPrices + expertPrices
-}
-
-// Риск(количественная величина)
-func calculateR(a float64, b int) float64 {
-	return a * float64(b)
+	risk := utils.CalculateR(probabilityTotal, loss)
+	log.Printf("Риск вычисленный по формуле: %.2f", risk)
 }
 
 // по формуле зависимых событий
